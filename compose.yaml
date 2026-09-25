@@ -1,0 +1,48 @@
+# Local execution of the containerized Flask API.
+#   docker compose up -d --build      (build locally)
+#   docker compose pull && docker compose up -d   (use the Docker Hub image)
+name: msc-de1-flask
+
+services:
+  api:
+    image: docker.io/${DOCKERHUB_USER:-messco}/msc-de1-flask-app:${APP_VERSION:-1.0.0}
+    build:
+      context: .
+      target: runtime
+      args:
+        APP_VERSION: ${APP_VERSION:-1.0.0}
+    ports:
+      - "127.0.0.1:8080:8000"          # host (loopback only) -> container
+    environment:                        # non-sensitive settings only
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    # ---- security hardening ----
+    user: "10001:10001"                 # same non-root UID/GID as the image
+    read_only: true                     # immutable root filesystem
+    tmpfs:
+      - /tmp:size=16m,mode=1777,noexec,nosuid,nodev   # gunicorn heartbeat files
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+          pids: 100
+        reservations:
+          memory: 64M
+    stop_grace_period: 25s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
