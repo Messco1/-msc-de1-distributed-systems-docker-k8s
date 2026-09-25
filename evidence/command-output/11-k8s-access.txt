@@ -1,0 +1,25 @@
+# Access through the Service (port-forward)
+# generated 2026-09-25T16:41:07Z on Linux x86_64
+
+$ curl -s -i http://127.0.0.1:8080/
+HTTP/1.1 200 OK
+Server: gunicorn
+Date: Fri, 25 Sep 2026 16:41:11 GMT
+Connection: keep-alive
+Content-Type: text/html; charset=utf-8
+Content-Length: 13
+
+Hello, Flask!
+$ curl -s http://127.0.0.1:8080/version
+{"hostname":"flask-api-7bc59cddc7-7qjdk","version":"1.0.0"}
+
+$ curl -s -X POST -H 'Content-Type: application/json' -d '{"name": "k8s-item"}' http://127.0.0.1:8080/items
+{"message":"Item added successfully"}
+
+$ curl -s http://127.0.0.1:8080/items/0
+{"item":{"name":"k8s-item"}}
+
+$ curl -s -w ' HTTP %{http_code}
+' http://127.0.0.1:8080/items/99
+{"error":"Item not found"}
+ HTTP 404

@@ -1,0 +1,84 @@
+# Deploy manifests in namespace msc-de1-project
+# generated 2026-09-25T16:40:28Z on Linux x86_64
+
+$ kubectl apply -f k8s/namespace.yaml
+namespace/msc-de1-project created
+
+$ kubectl apply -f k8s/
+configmap/flask-api-config created
+deployment.apps/flask-api created
+namespace/msc-de1-project unchanged
+networkpolicy.networking.k8s.io/default-deny-all created
+networkpolicy.networking.k8s.io/flask-api-allow-ingress-from-clients created
+networkpolicy.networking.k8s.io/api-client-allow-egress created
+service/flask-api created
+
+$ kubectl -n msc-de1-project rollout status deployment/flask-api --timeout=180s
+Waiting for deployment "flask-api" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "flask-api" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "flask-api" rollout to finish: 0 of 2 updated replicas are available...
+deployment "flask-api" successfully rolled out
+
+$ kubectl -n msc-de1-project get deploy,rs,pods,svc,netpol,cm -o wide
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                     SELECTOR
+deployment.apps/flask-api   2/2     2            2           33s   api          docker.io/messco/msc-de1-flask-app:1.0.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api
+
+NAME                                   DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES                                     SELECTOR
+replicaset.apps/flask-api-7bc59cddc7   2         2         2       32s   api          docker.io/messco/msc-de1-flask-app:1.0.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,pod-template-hash=7bc59cddc7
+
+NAME                             READY   STATUS    RESTARTS   AGE   IP           NODE             NOMINATED NODE   READINESS GATES
+pod/flask-api-7bc59cddc7-7qjdk   1/1     Running   0          32s   10.244.1.3   msc-de1-worker   <none>           <none>
+pod/flask-api-7bc59cddc7-lg2hx   1/1     Running   0          32s   10.244.1.2   msc-de1-worker   <none>           <none>
+
+NAME                TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+service/flask-api   ClusterIP   10.96.63.93   <none>        80/TCP    32s   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api
+
+NAME                                                                   POD-SELECTOR                       AGE
+networkpolicy.networking.k8s.io/api-client-allow-egress                role=api-client                    32s
+networkpolicy.networking.k8s.io/default-deny-all                       <none>                             32s
+networkpolicy.networking.k8s.io/flask-api-allow-ingress-from-clients   app.kubernetes.io/name=flask-api   32s
+
+NAME                         DATA   AGE
+configmap/flask-api-config   2      33s
+configmap/kube-root-ca.crt   1      34s
+
+$ kubectl -n msc-de1-project get pods -o custom-columns=POD:.metadata.name,NODE:.spec.nodeName,IP:.status.podIP,IMAGE:.spec.containers[0].image,STATUS:.status.phase
+POD                          NODE             IP           IMAGE                                      STATUS
+flask-api-7bc59cddc7-7qjdk   msc-de1-worker   10.244.1.3   docker.io/messco/msc-de1-flask-app:1.0.0   Running
+flask-api-7bc59cddc7-lg2hx   msc-de1-worker   10.244.1.2   docker.io/messco/msc-de1-flask-app:1.0.0   Running
+
+# the Service selects exactly the Deployment's pods (compare IPs above)
+
+$ kubectl -n msc-de1-project describe svc flask-api
+Name:                     flask-api
+Namespace:                msc-de1-project
+Labels:                   app.kubernetes.io/name=flask-api
+                          app.kubernetes.io/part-of=msc-de1-distributed-systems
+Annotations:              <none>
+Selector:                 app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.96.63.93
+IPs:                      10.96.63.93
+Port:                     http  80/TCP
+TargetPort:               http/TCP
+Endpoints:                10.244.1.2:8000,10.244.1.3:8000
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>
+
+$ kubectl -n msc-de1-project get endpointslices -l kubernetes.io/service-name=flask-api -o wide
+NAME              ADDRESSTYPE   PORTS   ENDPOINTS               AGE
+flask-api-8v4tv   IPv4          8000    10.244.1.2,10.244.1.3   33s
+
+$ kubectl -n msc-de1-project get pods -l app.kubernetes.io/name=flask-api --show-labels
+NAME                         READY   STATUS    RESTARTS   AGE   LABELS
+flask-api-7bc59cddc7-7qjdk   1/1     Running   0          33s   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,app.kubernetes.io/part-of=msc-de1-distributed-systems,pod-template-hash=7bc59cddc7
+flask-api-7bc59cddc7-lg2hx   1/1     Running   0          33s   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,app.kubernetes.io/part-of=msc-de1-distributed-systems,pod-template-hash=7bc59cddc7
+NAME                         READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
+flask-api-56bd689ddc-hr2bb   1/1     Running   0          56s   10.244.2.2   msc-de1-worker2   <none>           <none>
+flask-api-56bd689ddc-qjnq4   1/1     Running   0          26s   10.244.2.3   msc-de1-worker2   <none>           <none>
+NAME                         READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
+flask-api-7fd55f4d8b-4xq99   1/1     Running   0          45s   10.244.2.4   msc-de1-worker2   <none>           <none>
+flask-api-7fd55f4d8b-nts4h   1/1     Running   0          57s   10.244.1.4   msc-de1-worker    <none>           <none>

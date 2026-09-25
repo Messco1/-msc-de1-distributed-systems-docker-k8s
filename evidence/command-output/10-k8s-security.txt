@@ -1,0 +1,29 @@
+# Effective security settings of a running pod
+# generated 2026-09-25T16:41:05Z on Linux x86_64
+
+$ kubectl -n msc-de1-project get pod flask-api-7bc59cddc7-7qjdk -o jsonpath='{.spec.securityContext}{"
+"}{.spec.containers[0].securityContext}{"
+"}{.spec.containers[0].resources}{"
+"}'
+{"fsGroup":10001,"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001,"seccompProfile":{"type":"RuntimeDefault"}}
+{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsNonRoot":true}
+{"limits":{"cpu":"250m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}
+
+$ kubectl -n msc-de1-project exec flask-api-7bc59cddc7-7qjdk -- id
+uid=10001(app) gid=10001(app) groups=10001(app)
+
+$ kubectl -n msc-de1-project exec flask-api-7bc59cddc7-7qjdk -- sh -c 'touch /app/x 2>&1; grep -E "^Cap(Prm|Eff)" /proc/1/status; grep Seccomp: /proc/1/status'
+touch: cannot touch '/app/x': Read-only file system
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+Seccomp:	2
+
+$ kubectl get ns msc-de1-project --show-labels
+NAME              STATUS   AGE   LABELS
+msc-de1-project   Active   37s   app.kubernetes.io/part-of=msc-de1-distributed-systems,kubernetes.io/metadata.name=msc-de1-project,pod-security.kubernetes.io/audit=restricted,pod-security.kubernetes.io/enforce-version=latest,pod-security.kubernetes.io/enforce=restricted,pod-security.kubernetes.io/warn=restricted
+
+# Pod Security Admission (restricted) rejects a pod with default (root) settings:
+
+$ kubectl -n msc-de1-project run bad --image=busybox:1.36 --restart=Never -- sleep 1    # expected to FAIL
+Error from server (Forbidden): pods "bad" is forbidden: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "bad" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container "bad" must set securityContext.capabilities.drop=["ALL"]), runAsNonRoot != true (pod or container "bad" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container "bad" must set securityContext.seccompProfile.type to "RuntimeDefault" or "Localhost")
+-> failed as expected (exit code != 0)

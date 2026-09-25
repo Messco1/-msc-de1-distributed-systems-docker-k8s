@@ -1,0 +1,45 @@
+# kind cluster (1 control-plane + 2 workers)
+# generated 2026-09-25T16:37:51Z on Linux x86_64
+
+$ kind version && kubectl version --client
+kind v0.33.0 go1.26.7 linux/amd64
+Client Version: v1.37.1
+Kustomize Version: v5.8.1
+
+$ kind create cluster --config kind/kind-config.yaml --wait 120s
+Creating cluster "msc-de1" ...
+ • Ensuring node image (kindest/node:v1.37.0) 🖼️  ...
+ ✓ Ensuring node image (kindest/node:v1.37.0) 🖼️
+ • Preparing nodes 📦 📦 📦   ...
+ ✓ Preparing nodes 📦 📦 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+ • Joining worker nodes 🚜  ...
+ ✓ Joining worker nodes 🚜
+ • Waiting ≤ 2m0s for control-plane = Ready ⏳  ...
+ ✓ Waiting ≤ 2m0s for control-plane = Ready ⏳
+ • Ready after 9s 💚
+Set kubectl context to "kind-msc-de1"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-msc-de1
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
+
+$ kubectl cluster-info --context kind-msc-de1
+Kubernetes control plane is running at https://127.0.0.1:44725
+CoreDNS is running at https://127.0.0.1:44725/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+
+$ kubectl get nodes -o wide
+NAME                    STATUS     ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION                              CONTAINER-RUNTIME
+msc-de1-control-plane   Ready      control-plane   27s   v1.37.0   172.20.0.8    <none>        Debian GNU/Linux 13 (trixie)   6.18.33.2-microsoft-standard-WSL2 (amd64)   containerd://2.3.4
+msc-de1-worker          NotReady   <none>          12s   v1.37.0   172.20.0.6    <none>        Debian GNU/Linux 13 (trixie)   6.18.33.2-microsoft-standard-WSL2 (amd64)   containerd://2.3.4
+msc-de1-worker2         NotReady   <none>          12s   v1.37.0   172.20.0.7    <none>        Debian GNU/Linux 13 (trixie)   6.18.33.2-microsoft-standard-WSL2 (amd64)   containerd://2.3.4
