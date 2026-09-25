@@ -1,1 +1,12 @@
+# Runtime dependencies - every version pinned for reproducible builds.
+# Original starter file contained only "flask==2.3.3" (kept unchanged).
 flask==2.3.3
+# ADDED: production WSGI server (Flask's built-in server is for development only).
+gunicorn==26.2.0
+# ADDED: transitive dependencies pinned to the versions resolved during the baseline.
+blinker==1.9.0
+click==8.5.0
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+Werkzeug==3.1.8
