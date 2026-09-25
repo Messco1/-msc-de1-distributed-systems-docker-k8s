@@ -10,3 +10,4 @@
 - Added `GET /health` (probes) and `GET /version` (image version + serving pod).
   All original routes and tests unchanged.
 - Dependencies: all versions pinned; `gunicorn` added.
+- Flask upgraded 2.3.3 -> 3.1.3 after the Trivy scan (fixes CVE-2026-27205, LOW).
