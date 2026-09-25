@@ -1,0 +1,101 @@
+# Baseline - original application without Docker
+# generated 2026-09-24T12:47:38Z on Linux x86_64
+
+$ python3 --version
+Python 3.14.4
+
+$ python3 -m venv .venv
+
+$ .venv/bin/pip install --quiet -r requirements.txt && .venv/bin/pip freeze
+blinker==1.9.0
+click==8.5.0
+Flask==2.3.3
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+Werkzeug==3.1.8
+
+$ .venv/bin/python -m unittest discover -v tests
+test_add_item_route (test_app.TestAppRoutes.test_add_item_route) ... ok
+test_get_item_route (test_app.TestAppRoutes.test_get_item_route) ... ok
+test_get_nonexistent_item_route (test_app.TestAppRoutes.test_get_nonexistent_item_route) ... ok
+test_hello_route (test_app.TestAppRoutes.test_hello_route) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.039s
+
+OK
+
+# starting the app with the original launch script: python run.py
+
+$ curl -s -i http://127.0.0.1:5000/
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.14.4
+Date: Thu, 24 Sep 2026 12:47:51 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 13
+Connection: close
+
+Hello, Flask!
+$ curl -s -i http://127.0.0.1:5000/items
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.14.4
+Date: Thu, 24 Sep 2026 12:47:51 GMT
+Content-Type: application/json
+Content-Length: 13
+Connection: close
+
+{"items":[]}
+
+$ curl -s -i -X POST -H 'Content-Type: application/json' -d '{"name": "item1"}' http://127.0.0.1:5000/items
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.8 Python/3.14.4
+Date: Thu, 24 Sep 2026 12:47:51 GMT
+Content-Type: application/json
+Content-Length: 38
+Connection: close
+
+{"message":"Item added successfully"}
+
+$ curl -s -i http://127.0.0.1:5000/items
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.14.4
+Date: Thu, 24 Sep 2026 12:47:51 GMT
+Content-Type: application/json
+Content-Length: 29
+Connection: close
+
+{"items":[{"name":"item1"}]}
+
+$ curl -s -i http://127.0.0.1:5000/items/0
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.14.4
+Date: Thu, 24 Sep 2026 12:47:51 GMT
+Content-Type: application/json
+Content-Length: 26
+Connection: close
+
+{"item":{"name":"item1"}}
+
+$ curl -s -i http://127.0.0.1:5000/items/5
+HTTP/1.1 404 NOT FOUND
+Server: Werkzeug/3.1.8 Python/3.14.4
+Date: Thu, 24 Sep 2026 12:47:51 GMT
+Content-Type: application/json
+Content-Length: 27
+Connection: close
+
+{"error":"Item not found"}
+
+$ cat /tmp/baseline-app.log
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [24/Sep/2026 14:47:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 14:47:51] "GET /items HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 14:47:51] "[35m[1mPOST /items HTTP/1.1[0m" 201 -
+127.0.0.1 - - [24/Sep/2026 14:47:51] "GET /items HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 14:47:51] "GET /items/0 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 14:47:51] "[33mGET /items/5 HTTP/1.1[0m" 404 -
