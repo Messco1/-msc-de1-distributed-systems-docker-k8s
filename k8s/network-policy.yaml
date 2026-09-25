@@ -1,0 +1,64 @@
+# Intended network access:
+#   * everything in the namespace is denied by default (ingress AND egress);
+#   * the API pods accept TCP/8000 only from pods labelled role=api-client
+#     in the same namespace; they need no egress at all (no DB, no DNS);
+#   * api-client pods may reach the API pods and cluster DNS only.
+# kubelet probes and "kubectl port-forward" are not affected (node-local traffic).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: msc-de1-project
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: flask-api-allow-ingress-from-clients
+  namespace: msc-de1-project
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: flask-api
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: api-client
+      ports:
+        - protocol: TCP
+          port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-client-allow-egress
+  namespace: msc-de1-project
+spec:
+  podSelector:
+    matchLabels:
+      role: api-client
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: flask-api
+      ports:
+        - protocol: TCP
+          port: 8000
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
