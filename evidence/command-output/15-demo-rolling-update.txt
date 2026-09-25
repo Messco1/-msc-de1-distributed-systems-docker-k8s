@@ -1,0 +1,118 @@
+# D. Rolling update 1.0.0 -> 1.1.0 and rollback
+# generated 2026-09-25T17:02:15Z on Linux x86_64
+
+$ kubectl -n msc-de1-project rollout history deployment/flask-api
+deployment.apps/flask-api 
+REVISION  CHANGE-CAUSE
+1         initial deployment of image 1.0.0
+2         initial deployment of image 1.0.0
+3         enforce spreading of replicas over worker nodes
+4         topology spread: ignore tainted control-plane node
+
+
+$ kubectl -n msc-de1-project set image deployment/flask-api api=docker.io/messco/msc-de1-flask-app:1.1.0
+deployment.apps/flask-api image updated
+
+$ kubectl -n msc-de1-project annotate deployment/flask-api kubernetes.io/change-cause='rolling update to image 1.1.0' --overwrite
+deployment.apps/flask-api annotated
+
+$ kubectl -n msc-de1-project rollout status deployment/flask-api --timeout=180s
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+deployment "flask-api" successfully rolled out
+
+$ kubectl -n msc-de1-project get rs -o wide
+NAME                   DESIRED   CURRENT   READY   AGE     CONTAINERS   IMAGES                                     SELECTOR
+flask-api-56bd689ddc   0         0         0       20m     api          docker.io/messco/msc-de1-flask-app:1.0.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,pod-template-hash=56bd689ddc
+flask-api-5bc5b849d5   0         0         0       4m26s   api          docker.io/messco/msc-de1-flask-app:1.0.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,pod-template-hash=5bc5b849d5
+flask-api-7bc59cddc7   0         0         0       22m     api          docker.io/messco/msc-de1-flask-app:1.0.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,pod-template-hash=7bc59cddc7
+flask-api-7fc7578676   2         2         2       43s     api          docker.io/messco/msc-de1-flask-app:1.1.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,pod-template-hash=7fc7578676
+flask-api-7fd55f4d8b   0         0         0       18m     api          docker.io/messco/msc-de1-flask-app:1.0.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api,pod-template-hash=7fd55f4d8b
+
+$ kubectl -n msc-de1-project rollout history deployment/flask-api
+deployment.apps/flask-api 
+REVISION  CHANGE-CAUSE
+1         initial deployment of image 1.0.0
+2         initial deployment of image 1.0.0
+3         enforce spreading of replicas over worker nodes
+4         topology spread: ignore tainted control-plane node
+5         rolling update to image 1.1.0
+
+
+$ for i in 1 2 3 4; do kubectl -n msc-de1-project exec client-allowed -- curl -s http://flask-api/version; echo; done
+{"hostname":"flask-api-7fc7578676-t8g4q","version":"1.1.0"}
+
+{"hostname":"flask-api-7fc7578676-bns2j","version":"1.1.0"}
+
+{"hostname":"flask-api-7fc7578676-t8g4q","version":"1.1.0"}
+
+{"hostname":"flask-api-7fc7578676-bns2j","version":"1.1.0"}
+
+
+# rollback to the previous revision
+
+$ kubectl -n msc-de1-project rollout undo deployment/flask-api
+Warning: resource deployments/flask-api was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+deployment.apps/flask-api rolled back
+
+$ kubectl -n msc-de1-project annotate deployment/flask-api kubernetes.io/change-cause='rollback to image 1.0.0' --overwrite
+deployment.apps/flask-api annotated
+
+$ kubectl -n msc-de1-project rollout status deployment/flask-api --timeout=180s
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "flask-api" rollout to finish: 1 old replicas are pending termination...
+deployment "flask-api" successfully rolled out
+
+$ kubectl -n msc-de1-project rollout history deployment/flask-api
+deployment.apps/flask-api 
+REVISION  CHANGE-CAUSE
+1         initial deployment of image 1.0.0
+2         initial deployment of image 1.0.0
+3         enforce spreading of replicas over worker nodes
+5         rolling update to image 1.1.0
+6         rollback to image 1.0.0
+
+
+$ kubectl -n msc-de1-project get deploy flask-api -o jsonpath='{.spec.template.spec.containers[0].image}{"
+"}'
+docker.io/messco/msc-de1-flask-app:1.0.0
+
+$ for i in 1 2 3 4; do kubectl -n msc-de1-project exec client-allowed -- curl -s http://flask-api/version; echo; done
+{"hostname":"flask-api-5bc5b849d5-vcwvk","version":"1.0.0"}
+
+{"hostname":"flask-api-5bc5b849d5-vcwvk","version":"1.0.0"}
+
+{"hostname":"flask-api-5bc5b849d5-l2q5w","version":"1.0.0"}
+
+{"hostname":"flask-api-5bc5b849d5-l2q5w","version":"1.0.0"}
+
+
+$ kubectl delete -f scripts/netpol-test-pods.yaml --wait=false
+pod "client-allowed" deleted from msc-de1-project namespace
+pod "client-denied" deleted from msc-de1-project namespace
+
+# final state = Git manifests (image 1.0.0, 2 replicas)
+
+$ kubectl -n msc-de1-project get deploy,pods -o wide
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                     SELECTOR
+deployment.apps/flask-api   2/2     2            2           23m   api          docker.io/messco/msc-de1-flask-app:1.0.0   app.kubernetes.io/component=api,app.kubernetes.io/name=flask-api
+
+NAME                             READY   STATUS        RESTARTS   AGE   IP            NODE              NOMINATED NODE   READINESS GATES
+pod/client-allowed               1/1     Terminating   0          11m   10.244.2.5    msc-de1-worker2   <none>           <none>
+pod/client-denied                1/1     Terminating   0          11m   10.244.2.6    msc-de1-worker2   <none>           <none>
+pod/flask-api-5bc5b849d5-l2q5w   1/1     Running       0          30s   10.244.2.12   msc-de1-worker2   <none>           <none>
+pod/flask-api-5bc5b849d5-vcwvk   1/1     Running       0          17s   10.244.1.7    msc-de1-worker    <none>           <none>
+pod/flask-api-7fc7578676-bns2j   1/1     Terminating   0          61s   10.244.1.6    msc-de1-worker    <none>           <none>

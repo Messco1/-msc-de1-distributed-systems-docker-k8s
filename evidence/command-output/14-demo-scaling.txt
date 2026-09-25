@@ -1,12 +1,34 @@
 # C. Scaling 2 -> 3 -> 2
-# generated 2026-09-25T16:53:07Z on Linux x86_64
+# generated 2026-09-25T17:01:41Z on Linux x86_64
 
 $ kubectl -n msc-de1-project scale deployment/flask-api --replicas=3
 deployment.apps/flask-api scaled
 
 $ kubectl -n msc-de1-project rollout status deployment/flask-api --timeout=120s
 Waiting for deployment "flask-api" rollout to finish: 2 of 3 updated replicas are available...
-error: timed out waiting for the condition
-17m         Warning   FailedScheduling    pod/flask-api-7bc59cddc7-7qjdk    0/3 nodes are available: 3 node(s) had untolerated taint(s). preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.
-17m         Warning   FailedScheduling    pod/flask-api-7bc59cddc7-lg2hx    0/3 nodes are available: 3 node(s) had untolerated taint(s). preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.
-5m9s        Warning   FailedScheduling    pod/flask-api-7fd55f4d8b-dplb2    0/3 nodes are available: 1 node(s) had untolerated taint(s), 2 node(s) didn't match pod topology spread constraints. preemption: 0/3 nodes are available: 1 Preemption is not helpful for scheduling, 2 No preemption victims found for incoming pod.
+Waiting for deployment "flask-api" rollout to finish: 2 of 3 updated replicas are available...
+deployment "flask-api" successfully rolled out
+
+$ kubectl -n msc-de1-project get deploy flask-api
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+flask-api   3/3     3            3           21m
+
+$ kubectl -n msc-de1-project get pods -l app.kubernetes.io/name=flask-api -o wide
+NAME                         READY   STATUS    RESTARTS   AGE     IP            NODE              NOMINATED NODE   READINESS GATES
+flask-api-5bc5b849d5-9pwxx   1/1     Running   0          3m12s   10.244.1.5    msc-de1-worker    <none>           <none>
+flask-api-5bc5b849d5-cgssn   1/1     Running   0          30s     10.244.2.9    msc-de1-worker2   <none>           <none>
+flask-api-5bc5b849d5-dslvs   1/1     Running   0          18s     10.244.2.10   msc-de1-worker2   <none>           <none>
+
+$ kubectl -n msc-de1-project get endpointslices -l kubernetes.io/service-name=flask-api
+NAME              ADDRESSTYPE   PORTS   ENDPOINTS                           AGE
+flask-api-8v4tv   IPv4          8000    10.244.1.5,10.244.2.9,10.244.2.10   21m
+
+$ kubectl -n msc-de1-project scale deployment/flask-api --replicas=2
+deployment.apps/flask-api scaled
+
+$ sleep 15; kubectl -n msc-de1-project get deploy flask-api; kubectl -n msc-de1-project get pods -l app.kubernetes.io/name=flask-api -o wide
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+flask-api   2/2     2            2           21m
+NAME                         READY   STATUS    RESTARTS   AGE     IP           NODE              NOMINATED NODE   READINESS GATES
+flask-api-5bc5b849d5-9pwxx   1/1     Running   0          3m28s   10.244.1.5   msc-de1-worker    <none>           <none>
+flask-api-5bc5b849d5-cgssn   1/1     Running   0          46s     10.244.2.9   msc-de1-worker2   <none>           <none>
