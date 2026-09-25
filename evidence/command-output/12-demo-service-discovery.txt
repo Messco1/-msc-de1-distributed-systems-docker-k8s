@@ -1,0 +1,66 @@
+# A. Replication, service discovery and network policy
+# generated 2026-09-25T16:52:13Z on Linux x86_64
+
+$ kubectl apply -f scripts/netpol-test-pods.yaml
+pod/client-allowed created
+pod/client-denied created
+
+$ kubectl -n msc-de1-project wait --for=condition=Ready pod/client-allowed pod/client-denied --timeout=120s
+pod/client-allowed condition met
+pod/client-denied condition met
+
+# requests through the Service DNS name are load-balanced over the replicas
+
+$ for i in $(seq 1 10); do kubectl -n msc-de1-project exec client-allowed -- curl -s http://flask-api/version; echo; done
+{"hostname":"flask-api-7fd55f4d8b-4xq99","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-nts4h","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-nts4h","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-4xq99","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-4xq99","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-4xq99","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-nts4h","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-4xq99","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-4xq99","version":"1.0.0"}
+
+{"hostname":"flask-api-7fd55f4d8b-4xq99","version":"1.0.0"}
+
+
+# state is kept in memory PER POD: after one POST, GET /items differs by pod
+
+$ kubectl -n msc-de1-project exec client-allowed -- curl -s -X POST -H 'Content-Type: application/json' -d '{"name":"only-on-one-pod"}' http://flask-api/items
+{"message":"Item added successfully"}
+
+$ for i in $(seq 1 6); do kubectl -n msc-de1-project exec client-allowed -- curl -s http://flask-api/items; echo; done
+{"items":[]}
+
+{"items":[]}
+
+{"items":[{"name":"only-on-one-pod"}]}
+
+{"items":[{"name":"only-on-one-pod"}]}
+
+{"items":[{"name":"only-on-one-pod"}]}
+
+{"items":[]}
+
+
+# NetworkPolicy: pod without role=api-client label is blocked
+
+$ kubectl -n msc-de1-project exec client-denied -- curl -s -m 5 http://flask-api/health    # expected to FAIL
+command terminated with exit code 28
+-> failed as expected (exit code != 0)
+
+$ kubectl -n msc-de1-project exec client-denied -- curl -s -m 5 http://10.244.2.4:8000/health    # expected to FAIL
+command terminated with exit code 28
+-> failed as expected (exit code != 0)
+
+$ kubectl -n msc-de1-project exec client-allowed -- curl -s -m 5 http://10.244.2.4:8000/health
+{"status":"ok"}

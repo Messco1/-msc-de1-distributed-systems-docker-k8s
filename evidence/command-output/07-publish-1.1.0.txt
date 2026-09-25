@@ -1,0 +1,267 @@
+# Docker Hub publication of docker.io/messco/msc-de1-flask-app:1.1.0
+# generated 2026-09-25T16:48:26Z on Linux x86_64
+
+# log in interactively (credentials are stored by Docker, never in the repo)
+
+$ docker buildx build --builder msc-builder --platform linux/amd64,linux/arm64 --target runtime --build-arg APP_VERSION=1.1.0 --provenance=true --sbom=true -t docker.io/messco/msc-de1-flask-app:1.1.0 -t docker.io/messco/msc-de1-flask-app:latest --push .
+#0 building with "msc-builder" instance using docker-container driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 3.22kB 0.0s done
+#1 DONE 0.1s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 ...
+
+#3 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 1.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
+#4 resolve docker.io/docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32 0.2s done
+#4 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
+#4 CACHED
+
+#5 resolve image config for docker-image://docker.io/docker/buildkit-syft-scanner:stable-1
+#5 ...
+
+#6 [auth] docker/buildkit-syft-scanner:pull token for registry-1.docker.io
+#6 DONE 0.0s
+
+#5 resolve image config for docker-image://docker.io/docker/buildkit-syft-scanner:stable-1
+#5 DONE 0.6s
+
+#7 [auth] library/python:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#8 [linux/arm64 internal] load metadata for docker.io/library/python:3.12-slim-trixie
+#8 DONE 0.6s
+
+#9 [linux/amd64 internal] load metadata for docker.io/library/python:3.12-slim-trixie
+#9 DONE 0.7s
+
+#10 [internal] load .dockerignore
+#10 transferring context: 882B done
+#10 DONE 0.1s
+
+#11 [internal] load build context
+#11 transferring context: 164B 0.0s done
+#11 DONE 0.1s
+
+#12 [linux/arm64 builder 1/4] FROM docker.io/library/python:3.12-slim-trixie@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9
+#12 resolve docker.io/library/python:3.12-slim-trixie@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9
+#12 resolve docker.io/library/python:3.12-slim-trixie@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9 0.3s done
+#12 DONE 0.3s
+
+#13 [linux/amd64 builder 1/4] FROM docker.io/library/python:3.12-slim-trixie@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9
+#13 ...
+
+#12 [linux/arm64 builder 1/4] FROM docker.io/library/python:3.12-slim-trixie@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9
+#12 CACHED
+
+#14 [linux/arm64 builder 2/4] RUN python -m venv /opt/venv
+#14 CACHED
+
+#15 [linux/arm64 builder 3/4] COPY requirements.txt /tmp/requirements.txt
+#15 CACHED
+
+#16 [linux/arm64 builder 4/4] RUN pip install --no-cache-dir -r /tmp/requirements.txt  && pip uninstall -y pip  && rm -f /tmp/requirements.txt
+#16 CACHED
+
+#13 [linux/amd64 builder 1/4] FROM docker.io/library/python:3.12-slim-trixie@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9
+#13 resolve docker.io/library/python:3.12-slim-trixie@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9 0.4s done
+#13 CACHED
+
+#17 [linux/amd64 builder 2/4] RUN python -m venv /opt/venv
+#17 CACHED
+
+#18 [linux/amd64 builder 3/4] COPY requirements.txt /tmp/requirements.txt
+#18 CACHED
+
+#19 [linux/amd64 builder 4/4] RUN pip install --no-cache-dir -r /tmp/requirements.txt  && pip uninstall -y pip  && rm -f /tmp/requirements.txt
+#19 CACHED
+
+#20 [linux/amd64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#20 ...
+
+#21 docker-image://docker.io/docker/buildkit-syft-scanner:stable-1
+#21 resolve docker.io/docker/buildkit-syft-scanner:stable-1 0.6s done
+#21 DONE 0.6s
+
+#22 [linux/arm64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#22 1.567 useradd warning: app's uid 10001 is greater than SYS_UID_MAX 999
+#22 ...
+
+#20 [linux/amd64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#20 0.853 useradd warning: app's uid 10001 is greater than SYS_UID_MAX 999
+#20 5.088 Found existing installation: pip 25.0.1
+#20 5.375 Uninstalling pip-25.0.1:
+#20 6.094   Successfully uninstalled pip-25.0.1
+#20 6.130 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#20 DONE 6.5s
+
+#23 [linux/amd64 runtime 3/6] WORKDIR /app
+#23 DONE 0.9s
+
+#22 [linux/arm64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#22 ...
+
+#24 [linux/amd64 runtime 4/6] COPY --from=builder /opt/venv /opt/venv
+#24 DONE 1.3s
+
+#22 [linux/arm64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#22 ...
+
+#25 [linux/amd64 runtime 5/6] COPY app/ ./app/
+#25 DONE 0.4s
+
+#22 [linux/arm64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#22 ...
+
+#26 [linux/amd64 runtime 6/6] COPY gunicorn.conf.py ./
+#26 DONE 0.4s
+
+#22 [linux/arm64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#22 ...
+
+#27 [linux/amd64] generating sbom using docker.io/docker/buildkit-syft-scanner:stable-1
+#27 CACHED
+
+#22 [linux/arm64 runtime 2/6] RUN groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home-dir /nonexistent --shell /usr/sbin/nologin app  && python -m pip uninstall -y pip  && rm -rf /root/.cache /tmp/*
+#22 86.76 Found existing installation: pip 25.0.1
+#22 89.19 Uninstalling pip-25.0.1:
+#22 91.48   Successfully uninstalled pip-25.0.1
+#22 91.67 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#22 DONE 92.7s
+
+#28 [linux/arm64 runtime 3/6] WORKDIR /app
+#28 DONE 0.4s
+
+#29 [linux/arm64 runtime 4/6] COPY --from=builder /opt/venv /opt/venv
+#29 DONE 0.8s
+
+#30 [linux/arm64 runtime 5/6] COPY app/ ./app/
+#30 DONE 0.4s
+
+#31 [linux/arm64 runtime 6/6] COPY gunicorn.conf.py ./
+#31 DONE 0.4s
+
+#32 [linux/arm64] generating sbom using docker.io/docker/buildkit-syft-scanner:stable-1
+#32 CACHED
+
+#33 exporting to image
+#33 exporting layers
+#33 exporting layers 7.2s done
+#33 exporting manifest sha256:b69bdbfc57e9f32724460f419cb4f8f214803faeab0cf2ed1b135af74e6e56fe 0.1s done
+#33 exporting config sha256:20dac9e5a7489afa2f73f61655631af81598d8f13c6fa93597460e39915f2676
+#33 exporting config sha256:20dac9e5a7489afa2f73f61655631af81598d8f13c6fa93597460e39915f2676 0.2s done
+#33 exporting attestation manifest sha256:bb196137a652ad0476e3bad8bead7ff0f10c25de540316c24f67a696e4569850
+#33 exporting attestation manifest sha256:bb196137a652ad0476e3bad8bead7ff0f10c25de540316c24f67a696e4569850 0.2s done
+#33 exporting manifest sha256:ddb43a441b15b77a2ea1eb9f9ce9d31e6466199d187d26844b856478bf5733d0 0.1s done
+#33 exporting config sha256:0911446ef3c603066412a94f2be6577280222a894fa9cee55c57f54a0042e6bd
+#33 exporting config sha256:0911446ef3c603066412a94f2be6577280222a894fa9cee55c57f54a0042e6bd 0.1s done
+#33 exporting attestation manifest sha256:a12c23849370fddbf417d4c2ef5f53371c7347875b70cd43af2db54fece0799d
+#33 exporting attestation manifest sha256:a12c23849370fddbf417d4c2ef5f53371c7347875b70cd43af2db54fece0799d 0.2s done
+#33 exporting manifest list sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d
+#33 exporting manifest list sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d 0.2s done
+#33 DONE 10.2s
+
+#33 exporting to image
+#33 pushing layers
+#33 ...
+
+#34 [auth] messco/msc-de1-flask-app:pull,push token for registry-1.docker.io
+#34 DONE 0.0s
+
+#33 exporting to image
+#33 pushing layers 5.7s done
+#33 pushing manifest for docker.io/messco/msc-de1-flask-app:1.1.0@sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d
+#33 pushing manifest for docker.io/messco/msc-de1-flask-app:1.1.0@sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d 3.9s done
+#33 pushing layers 0.7s done
+#33 pushing manifest for docker.io/messco/msc-de1-flask-app:latest@sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d
+#33 pushing manifest for docker.io/messco/msc-de1-flask-app:latest@sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d 2.3s done
+#33 DONE 22.8s
+
+$ docker buildx imagetools inspect docker.io/messco/msc-de1-flask-app:1.1.0
+Name:      docker.io/messco/msc-de1-flask-app:1.1.0
+MediaType: application/vnd.oci.image.index.v1+json
+Digest:    sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d
+           
+Manifests: 
+  Name:        docker.io/messco/msc-de1-flask-app:1.1.0@sha256:b69bdbfc57e9f32724460f419cb4f8f214803faeab0cf2ed1b135af74e6e56fe
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/amd64
+               
+  Name:        docker.io/messco/msc-de1-flask-app:1.1.0@sha256:ddb43a441b15b77a2ea1eb9f9ce9d31e6466199d187d26844b856478bf5733d0
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/arm64
+               
+  Name:        docker.io/messco/msc-de1-flask-app:1.1.0@sha256:bb196137a652ad0476e3bad8bead7ff0f10c25de540316c24f67a696e4569850
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.digest: sha256:b69bdbfc57e9f32724460f419cb4f8f214803faeab0cf2ed1b135af74e6e56fe
+    vnd.docker.reference.type:   attestation-manifest
+               
+  Name:        docker.io/messco/msc-de1-flask-app:1.1.0@sha256:a12c23849370fddbf417d4c2ef5f53371c7347875b70cd43af2db54fece0799d
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.digest: sha256:ddb43a441b15b77a2ea1eb9f9ce9d31e6466199d187d26844b856478bf5733d0
+    vnd.docker.reference.type:   attestation-manifest
+
+# remove every local copy + build cache, then pull from Docker Hub
+
+$ docker rmi -f docker.io/messco/msc-de1-flask-app:1.1.0 docker.io/messco/msc-de1-flask-app:latest 2>/dev/null || true
+
+$ docker builder prune -f >/dev/null && echo build cache pruned
+build cache pruned
+
+$ docker pull docker.io/messco/msc-de1-flask-app:1.1.0
+1.1.0: Pulling from messco/msc-de1-flask-app
+44136fa355b3: Already exists
+6b484228f646: Pulling fs layer
+97774b37f5e2: Pulling fs layer
+48d4d87882cb: Pulling fs layer
+2f98a18f1d58: Pulling fs layer
+cddd21476e69: Pulling fs layer
+5a38ffc8aa95: Download complete
+cddd21476e69: Download complete
+97774b37f5e2: Download complete
+6b484228f646: Download complete
+48d4d87882cb: Download complete
+e544e8a4d56a: Download complete
+48d4d87882cb: Pull complete
+97774b37f5e2: Pull complete
+2f98a18f1d58: Download complete
+2f98a18f1d58: Pull complete
+cddd21476e69: Pull complete
+6b484228f646: Pull complete
+Digest: sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d
+Status: Downloaded newer image for messco/msc-de1-flask-app:1.1.0
+docker.io/messco/msc-de1-flask-app:1.1.0
+
+$ docker image inspect -f 'RepoDigests={{json .RepoDigests}}' docker.io/messco/msc-de1-flask-app:1.1.0
+RepoDigests=["messco/msc-de1-flask-app@sha256:4175ac4a4b197ba0f4916a4d1113eb6d62bc934852c920b26162ce3d2f06ae6d"]
+
+$ docker run -d --name flask-api-pulled -p 127.0.0.1:8080:8000 --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges:true docker.io/messco/msc-de1-flask-app:1.1.0
+18abcc2d8ca09de3d102edab05bf10696ab198ecdf5b7908da557c32833e1e23
+
+# container flask-api-pulled is healthy
+
+$ curl -s http://127.0.0.1:8080/ ; echo; curl -s http://127.0.0.1:8080/version
+Hello, Flask!
+{"hostname":"18abcc2d8ca0","version":"1.1.0"}
+
+$ curl -s -X POST -H 'Content-Type: application/json' -d '{"name": "from-hub"}' http://127.0.0.1:8080/items; curl -s http://127.0.0.1:8080/items/0
+{"message":"Item added successfully"}
+{"item":{"name":"from-hub"}}
+
+$ docker rm -f flask-api-pulled
+flask-api-pulled
+
+# public page: https://hub.docker.com/r/messco/msc-de1-flask-app

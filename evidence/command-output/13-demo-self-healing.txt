@@ -1,0 +1,35 @@
+# B. Self-healing
+# generated 2026-09-25T16:52:54Z on Linux x86_64
+
+$ kubectl -n msc-de1-project get pods -l app.kubernetes.io/name=flask-api -o wide
+NAME                         READY   STATUS    RESTARTS   AGE     IP           NODE              NOMINATED NODE   READINESS GATES
+flask-api-7fd55f4d8b-4xq99   1/1     Running   0          8m28s   10.244.2.4   msc-de1-worker2   <none>           <none>
+flask-api-7fd55f4d8b-nts4h   1/1     Running   0          8m40s   10.244.1.4   msc-de1-worker    <none>           <none>
+
+$ kubectl -n msc-de1-project delete pod flask-api-7fd55f4d8b-4xq99 --wait=false
+pod "flask-api-7fd55f4d8b-4xq99" deleted from msc-de1-project namespace
+
+$ sleep 2; kubectl -n msc-de1-project get pods -l app.kubernetes.io/name=flask-api -o wide
+NAME                         READY   STATUS        RESTARTS   AGE     IP           NODE              NOMINATED NODE   READINESS GATES
+flask-api-7fd55f4d8b-4xq99   1/1     Terminating   0          8m31s   10.244.2.4   msc-de1-worker2   <none>           <none>
+flask-api-7fd55f4d8b-czphp   0/1     Running       0          2s      10.244.2.7   msc-de1-worker2   <none>           <none>
+flask-api-7fd55f4d8b-nts4h   1/1     Running       0          8m43s   10.244.1.4   msc-de1-worker    <none>           <none>
+
+$ kubectl -n msc-de1-project rollout status deployment/flask-api --timeout=120s
+Waiting for deployment "flask-api" rollout to finish: 1 of 2 updated replicas are available...
+Waiting for deployment "flask-api" rollout to finish: 1 of 2 updated replicas are available...
+Waiting for deployment "flask-api" rollout to finish: 1 of 2 updated replicas are available...
+deployment "flask-api" successfully rolled out
+
+$ kubectl -n msc-de1-project get pods -l app.kubernetes.io/name=flask-api -o wide
+NAME                         READY   STATUS    RESTARTS   AGE     IP           NODE              NOMINATED NODE   READINESS GATES
+flask-api-7fd55f4d8b-czphp   1/1     Running   0          12s     10.244.2.7   msc-de1-worker2   <none>           <none>
+flask-api-7fd55f4d8b-nts4h   1/1     Running   0          8m53s   10.244.1.4   msc-de1-worker    <none>           <none>
+
+$ kubectl -n msc-de1-project get events --sort-by=.lastTimestamp | grep -Ei 'killing|successfulcreate|scheduled' | tail -6
+8m28s       Normal    Killing             pod/flask-api-56bd689ddc-qjnq4    Stopping container api
+53s         Normal    Scheduled           pod/client-allowed                Successfully assigned msc-de1-project/client-allowed to msc-de1-worker2
+53s         Normal    Scheduled           pod/client-denied                 Successfully assigned msc-de1-project/client-denied to msc-de1-worker2
+12s         Normal    SuccessfulCreate    replicaset/flask-api-7fd55f4d8b   Created pod: flask-api-7fd55f4d8b-czphp
+12s         Normal    Scheduled           pod/flask-api-7fd55f4d8b-czphp    Successfully assigned msc-de1-project/flask-api-7fd55f4d8b-czphp to msc-de1-worker2
+12s         Normal    Killing             pod/flask-api-7fd55f4d8b-4xq99    Stopping container api

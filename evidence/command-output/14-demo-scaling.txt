@@ -1,0 +1,12 @@
+# C. Scaling 2 -> 3 -> 2
+# generated 2026-09-25T16:53:07Z on Linux x86_64
+
+$ kubectl -n msc-de1-project scale deployment/flask-api --replicas=3
+deployment.apps/flask-api scaled
+
+$ kubectl -n msc-de1-project rollout status deployment/flask-api --timeout=120s
+Waiting for deployment "flask-api" rollout to finish: 2 of 3 updated replicas are available...
+error: timed out waiting for the condition
+17m         Warning   FailedScheduling    pod/flask-api-7bc59cddc7-7qjdk    0/3 nodes are available: 3 node(s) had untolerated taint(s). preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.
+17m         Warning   FailedScheduling    pod/flask-api-7bc59cddc7-lg2hx    0/3 nodes are available: 3 node(s) had untolerated taint(s). preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.
+5m9s        Warning   FailedScheduling    pod/flask-api-7fd55f4d8b-dplb2    0/3 nodes are available: 1 node(s) had untolerated taint(s), 2 node(s) didn't match pod topology spread constraints. preemption: 0/3 nodes are available: 1 Preemption is not helpful for scheduling, 2 No preemption victims found for incoming pod.
