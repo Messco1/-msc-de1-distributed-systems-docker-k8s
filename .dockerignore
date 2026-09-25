@@ -1,0 +1,62 @@
+# Keep the build context small and free of secrets.
+# Git metadata
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python caches and build artifacts
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# IDE / OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Local environment files and secrets (never in the image)
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Test output artifacts
+.coverage
+coverage.xml
+htmlcov/
+test-results/
+*.log
+
+# Project material unrelated to the runtime image
+security/
+evidence/
+docs/
+scripts/
+kind/
+k8s/
+compose.yaml
+README.md
+CHANGELOG.md
+LICENSE
+Dockerfile
+.dockerignore
+
+# Note: tests/ is kept in the context ONLY for the optional "test" build stage;
+# it is never copied into the final "runtime" stage.
