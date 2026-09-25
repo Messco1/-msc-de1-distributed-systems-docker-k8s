@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-api
+  namespace: msc-de1-project
+  labels:
+    app.kubernetes.io/name: flask-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: msc-de1-distributed-systems
+  annotations:
+    kubernetes.io/change-cause: "initial deployment of image 1.0.0"
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1          # at most 1 extra pod during an update
+      maxUnavailable: 0    # never go below the desired replica count
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: flask-api
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: flask-api
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: msc-de1-distributed-systems
+    spec:
+      automountServiceAccountToken: false   # the app never calls the K8s API
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      terminationGracePeriodSeconds: 30
+      securityContext:                      # pod level
+        runAsNonRoot: true
+        runAsUser: 10001                    # matches USER 10001:10001 in the image
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      # Spread replicas over the two worker nodes when scheduling permits.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          matchLabelKeys: ["pod-template-hash"]
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flask-api
+      containers:
+        - name: api
+          # Must match the tag documented in README.md (traceability).
+          image: docker.io/messco/msc-de1-flask-app:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: flask-api-config
+          readinessProbe:                   # gate traffic from the Service
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:                    # restart a hung container
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          lifecycle:
+            preStop:                        # let endpoints update before SIGTERM
+              exec:
+                command: ["sleep", "5"]
+          securityContext:                  # container level
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp                         # only writable location (gunicorn heartbeat)
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi

@@ -1,0 +1,13 @@
+# Non-sensitive runtime configuration (kept out of the image).
+# The application needs no secret; see README "Configuration and secrets".
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flask-api-config
+  namespace: msc-de1-project
+  labels:
+    app.kubernetes.io/name: flask-api
+    app.kubernetes.io/part-of: msc-de1-distributed-systems
+data:
+  LOG_LEVEL: "info"
+  GUNICORN_THREADS: "4"
