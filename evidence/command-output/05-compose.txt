@@ -1,5 +1,5 @@
 # Docker Compose
-# generated 2026-09-25T16:05:48Z on Linux x86_64
+# generated 2026-09-25T16:16:19Z on Linux x86_64
 
 $ docker compose config
 name: msc-de1-flask
@@ -68,25 +68,25 @@ $ docker compose up -d
  Container msc-de1-flask-api-1  Starting
  Container msc-de1-flask-api-1  Started
 
-# container 48eaceee6e23e711404ea6088eb09682792dd649021a87697f5b0b11a6d7a1ad is healthy
+# container 2ab20bda94407c20b40d77d7f920e9bf5bae4db9e017fbdc6fc1df4dcd0771e1 is healthy
 
 $ docker compose ps
 NAME                  IMAGE                                      COMMAND                  SERVICE   CREATED         STATUS                   PORTS
 msc-de1-flask-api-1   docker.io/messco/msc-de1-flask-app:1.0.0   "gunicorn --config g…"   api       8 seconds ago   Up 7 seconds (healthy)   127.0.0.1:8080->8000/tcp
 
 $ curl -s http://127.0.0.1:8080/version
-{"hostname":"48eaceee6e23","version":"1.0.0"}
+{"hostname":"2ab20bda9440","version":"1.0.0"}
 
 $ docker compose exec api id
 uid=10001(app) gid=10001(app) groups=10001(app)
 
 $ docker compose logs api
-api-1  | [2026-09-25 16:05:51 +0000] [1] [INFO] Starting gunicorn 26.2.0
-api-1  | [2026-09-25 16:05:51 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
-api-1  | [2026-09-25 16:05:51 +0000] [1] [INFO] Using worker: gthread
-api-1  | [2026-09-25 16:05:51 +0000] [7] [INFO] Booting worker with pid: 7
-api-1  | 127.0.0.1 - - [25/Sep/2026:16:05:56 +0000] "GET /health HTTP/1.1" 200 16 "-" "Python-urllib/3.12"
-api-1  | 172.23.0.1 - - [25/Sep/2026:16:05:57 +0000] "GET /version HTTP/1.1" 200 46 "-" "curl/8.18.0"
+api-1  | [2026-09-25 16:16:23 +0000] [1] [INFO] Starting gunicorn 26.2.0
+api-1  | [2026-09-25 16:16:23 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
+api-1  | [2026-09-25 16:16:23 +0000] [1] [INFO] Using worker: gthread
+api-1  | [2026-09-25 16:16:23 +0000] [7] [INFO] Booting worker with pid: 7
+api-1  | 127.0.0.1 - - [25/Sep/2026:16:16:27 +0000] "GET /health HTTP/1.1" 200 16 "-" "Python-urllib/3.12"
+api-1  | 172.23.0.1 - - [25/Sep/2026:16:16:28 +0000] "GET /version HTTP/1.1" 200 46 "-" "curl/8.18.0"
 
 $ docker compose down
  Container msc-de1-flask-api-1  Stopping

@@ -1,19 +1,19 @@
 # Run the container (hardened flags) and test the API
-# generated 2026-09-25T16:05:39Z on Linux x86_64
+# generated 2026-09-25T16:16:10Z on Linux x86_64
 
 $ docker run -d --name flask-api-test -p 127.0.0.1:8080:8000 --read-only --tmpfs /tmp:size=16m,noexec,nosuid,nodev --cap-drop ALL --security-opt no-new-privileges:true --memory 256m --cpus 0.5 --pids-limit 100 docker.io/messco/msc-de1-flask-app:1.0.0
-f0136cccd390847ea4f7e7840b2e98d55bfc6627e81e998155c3207b4cc19ea9
+de1c57278f13f8679f3072b52ab12ab5a79f10c6027f55ba09032ee8adf28433
 
 # container flask-api-test is healthy
 
 $ docker ps --filter name=flask-api-test --format 'table {{.Names}}	{{.Image}}	{{.Status}}	{{.Ports}}'
 NAMES            IMAGE                            STATUS                   PORTS
-flask-api-test   messco/msc-de1-flask-app:1.0.0   Up 6 seconds (healthy)   127.0.0.1:8080->8000/tcp
+flask-api-test   messco/msc-de1-flask-app:1.0.0   Up 7 seconds (healthy)   127.0.0.1:8080->8000/tcp
 
 $ curl -s -i http://127.0.0.1:8080/
 HTTP/1.1 200 OK
 Server: gunicorn
-Date: Fri, 25 Sep 2026 16:05:46 GMT
+Date: Fri, 25 Sep 2026 16:16:17 GMT
 Connection: keep-alive
 Content-Type: text/html; charset=utf-8
 Content-Length: 13
@@ -36,7 +36,7 @@ $ curl -s -w ' HTTP %{http_code}
 $ curl -s http://127.0.0.1:8080/health; echo; curl -s http://127.0.0.1:8080/version
 {"status":"ok"}
 
-{"hostname":"f0136cccd390","version":"1.0.0"}
+{"hostname":"de1c57278f13","version":"1.0.0"}
 
 # user identity inside the container (must NOT be root/uid 0)
 
@@ -45,8 +45,8 @@ uid=10001(app) gid=10001(app) groups=10001(app)
 
 $ docker top flask-api-test -o user,pid,args
 USER                PID                 COMMAND
-10001               9934                /opt/venv/bin/python /opt/venv/bin/gunicorn --config gunicorn.conf.py app:app
-10001               9961                /opt/venv/bin/python /opt/venv/bin/gunicorn --config gunicorn.conf.py app:app
+10001               12283               /opt/venv/bin/python /opt/venv/bin/gunicorn --config gunicorn.conf.py app:app
+10001               12337               /opt/venv/bin/python /opt/venv/bin/gunicorn --config gunicorn.conf.py app:app
 
 $ docker exec flask-api-test sh -c 'touch /app/hack 2>&1; touch /tmp/ok && echo /tmp is writable'
 touch: cannot touch '/app/hack': Read-only file system
@@ -56,33 +56,33 @@ $ docker inspect -f 'Health={{.State.Health.Status}} ReadOnly={{.HostConfig.Read
 Health=healthy ReadOnly=true CapDrop=[ALL] SecOpt=[no-new-privileges:true] Privileged=false
 
 $ docker logs flask-api-test
-[2026-09-25 16:05:41 +0000] [1] [INFO] Starting gunicorn 26.2.0
-[2026-09-25 16:05:41 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
-[2026-09-25 16:05:41 +0000] [1] [INFO] Using worker: gthread
-[2026-09-25 16:05:41 +0000] [7] [INFO] Booting worker with pid: 7
-127.0.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET /health HTTP/1.1" 200 16 "-" "Python-urllib/3.12"
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET / HTTP/1.1" 200 13 "-" "curl/8.18.0"
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET /items HTTP/1.1" 200 13 "-" "curl/8.18.0"
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "POST /items HTTP/1.1" 201 38 "-" "curl/8.18.0"
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET /items/0 HTTP/1.1" 200 26 "-" "curl/8.18.0"
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET /items/5 HTTP/1.1" 404 27 "-" "curl/8.18.0"
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET /health HTTP/1.1" 200 16 "-" "curl/8.18.0"
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET /version HTTP/1.1" 200 46 "-" "curl/8.18.0"
+[2026-09-25 16:16:12 +0000] [1] [INFO] Starting gunicorn 26.2.0
+[2026-09-25 16:16:12 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
+[2026-09-25 16:16:12 +0000] [1] [INFO] Using worker: gthread
+[2026-09-25 16:16:12 +0000] [7] [INFO] Booting worker with pid: 7
+127.0.0.1 - - [25/Sep/2026:16:16:17 +0000] "GET /health HTTP/1.1" 200 16 "-" "Python-urllib/3.12"
+172.17.0.1 - - [25/Sep/2026:16:16:17 +0000] "GET / HTTP/1.1" 200 13 "-" "curl/8.18.0"
+172.17.0.1 - - [25/Sep/2026:16:16:17 +0000] "GET /items HTTP/1.1" 200 13 "-" "curl/8.18.0"
+172.17.0.1 - - [25/Sep/2026:16:16:17 +0000] "POST /items HTTP/1.1" 201 38 "-" "curl/8.18.0"
+172.17.0.1 - - [25/Sep/2026:16:16:17 +0000] "GET /items/0 HTTP/1.1" 200 26 "-" "curl/8.18.0"
+172.17.0.1 - - [25/Sep/2026:16:16:18 +0000] "GET /items/5 HTTP/1.1" 404 27 "-" "curl/8.18.0"
+172.17.0.1 - - [25/Sep/2026:16:16:18 +0000] "GET /health HTTP/1.1" 200 16 "-" "curl/8.18.0"
+172.17.0.1 - - [25/Sep/2026:16:16:18 +0000] "GET /version HTTP/1.1" 200 46 "-" "curl/8.18.0"
 
 # graceful stop: gunicorn (PID 1) receives SIGTERM
 
 $ time docker stop flask-api-test
 flask-api-test
 
-real	0m0.720s
-user	0m0.017s
-sys	0m0.010s
+real	0m0.637s
+user	0m0.018s
+sys	0m0.008s
 
 $ docker logs --tail 4 flask-api-test
-172.17.0.1 - - [25/Sep/2026:16:05:46 +0000] "GET /version HTTP/1.1" 200 46 "-" "curl/8.18.0"
-[2026-09-25 16:05:47 +0000] [1] [INFO] Handling signal: term
-[2026-09-25 16:05:47 +0000] [7] [INFO] Worker exiting (pid: 7)
-[2026-09-25 16:05:47 +0000] [1] [INFO] Shutting down: Master
+172.17.0.1 - - [25/Sep/2026:16:16:18 +0000] "GET /version HTTP/1.1" 200 46 "-" "curl/8.18.0"
+[2026-09-25 16:16:18 +0000] [1] [INFO] Handling signal: term
+[2026-09-25 16:16:18 +0000] [7] [INFO] Worker exiting (pid: 7)
+[2026-09-25 16:16:18 +0000] [1] [INFO] Shutting down: Master
 
 $ docker rm flask-api-test
 flask-api-test

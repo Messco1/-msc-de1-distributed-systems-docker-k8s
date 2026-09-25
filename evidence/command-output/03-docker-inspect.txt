@@ -1,12 +1,12 @@
 # Image inspection
-# generated 2026-09-25T16:05:36Z on Linux x86_64
+# generated 2026-09-25T16:16:07Z on Linux x86_64
 
 $ docker image ls docker.io/messco/msc-de1-flask-app
 WARNING: This output is designed for human readability. For machine-readable output, please use --format.
 IMAGE   ID             DISK USAGE   CONTENT SIZE   EXTRA
 
 $ docker image inspect -f 'Size: {{.Size}} bytes' docker.io/messco/msc-de1-flask-app:1.0.0
-Size: 45449579 bytes
+Size: 45459747 bytes
 
 $ docker history --no-trunc --format 'table {{.Size}}	{{.CreatedBy}}' docker.io/messco/msc-de1-flask-app:1.0.0 | cut -c1-160
 SIZE      CREATED BY
@@ -18,7 +18,7 @@ SIZE      CREATED BY
 0B        USER 10001:10001
 12.3kB    COPY gunicorn.conf.py ./ # buildkit
 20.5kB    COPY app/ ./app/ # buildkit
-7.88MB    COPY /opt/venv /opt/venv # buildkit
+7.95MB    COPY /opt/venv /opt/venv # buildkit
 8.19kB    WORKDIR /app
 65.5kB    RUN |1 APP_VERSION=1.0.0 /bin/sh -c groupadd --system --gid 10001 app  && useradd --system --uid 10001 --gid 10001 --no-create-home             --home
 0B        ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PATH=/opt/venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin APP_VE
